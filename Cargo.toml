@@ -65,3 +65,9 @@ features = ["std"]
 
 [dev-dependencies]
 assert_fs = "1.0.0"
+criterion = "0.3"
+
+
+[[bench]]
+name = "blocks"
+harness = false
