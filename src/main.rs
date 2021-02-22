@@ -1,26 +1,23 @@
-#[macro_use]
-mod de;
-#[macro_use]
-mod util;
-pub mod blocks;
-mod config;
-mod errors;
-mod http;
-mod icons;
-mod input;
-mod scheduler;
-mod signals;
-mod subprocess;
-mod themes;
-mod widgets;
+extern crate i3status_rs;
+
+pub use i3status_rs::blocks;
+pub use i3status_rs::config;
+pub use i3status_rs::de;
+pub use i3status_rs::errors;
+pub use i3status_rs::http;
+pub use i3status_rs::icons;
+pub use i3status_rs::input;
+pub use i3status_rs::scheduler;
+pub use i3status_rs::signals;
+pub use i3status_rs::subprocess;
+pub use i3status_rs::themes;
+pub use i3status_rs::util;
+pub use i3status_rs::widgets;
 
 #[cfg(feature = "profiling")]
 use cpuprofiler::PROFILER;
 #[cfg(feature = "profiling")]
 use std::ops::DerefMut;
-
-#[cfg(feature = "pulseaudio")]
-use libpulse_binding as pulse;
 
 use std::time::Duration;
 
