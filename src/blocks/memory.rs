@@ -1,7 +1,6 @@
 use std::fmt;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::str::FromStr;
 use std::time::{Duration, Instant};
 
 use crossbeam_channel::Sender;
@@ -397,78 +396,38 @@ impl Block for Memory {
                 break;
             }
 
-            let mut tokens = line.split_whitespace();
-            let name = tokens.next();
+            macro_rules! meminfo_parse {
+                ( $line:expr; $($pattern:expr => $field:ident),+ ) => {{
+                    use std::str::FromStr;
+                    let mut tokens = $line.split_whitespace();
+                    let name = tokens.next();
 
-            match name {
-                Some(&"MemTotal:") => {
-                    mem_state.mem_total = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse mem_total")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"MemFree:") => {
-                    mem_state.mem_free = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse mem_free")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"Buffers:") => {
-                    mem_state.buffers = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse buffers")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"Cached:") => {
-                    mem_state.cached = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse cached")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"SReclaimable:") => {
-                    mem_state.s_reclaimable = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse s_reclaimable")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"Shmem:") => {
-                    mem_state.shmem = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse shmem")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"SwapTotal:") => {
-                    mem_state.swap_total = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse swap_total")?,
-                        true,
-                    );
-                    continue;
-                }
-                Some(&"SwapFree:") => {
-                    mem_state.swap_free = (
-                        u64::from_str(tokens.next())
-                            .block_error("memory", "failed to parse swap_free")?,
-                        true,
-                    );
-                    continue;
-                }
-                _ => {
-                    continue;
-                }
+                    match name {
+                        $(
+                            Some($pattern) => {
+                                mem_state.$field = (
+                                    u64::from_str(tokens.next().unwrap())
+                                        .block_error("memory", &format!("failed to parse {}", stringify!($field)))?,
+                                    true,
+                                );
+                                continue;
+                            }
+                        )+,
+                        _ => continue,
+                    }
+                }};
             }
+
+            meminfo_parse!(line;
+                "MemTotal:" => mem_total,
+                "MemFree:" => mem_free,
+                "Buffers:" => buffers,
+                "Cached:" => cached,
+                "SReclaimable:" => s_reclaimable,
+                "Shmem:" => shmem,
+                "SwapTotal:" => swap_total,
+                "SwapFree:" => swap_free
+            );
         }
 
         // Now, create the string to be shown
