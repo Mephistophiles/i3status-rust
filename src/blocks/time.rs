@@ -26,7 +26,7 @@ pub struct Time {
     locale: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Default, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(deny_unknown_fields)]
 pub struct TimeConfig {
     /// Format string.<br/> See [chrono docs](https://docs.rs/chrono/0.3.0/chrono/format/strftime/index.html#specifiers) for all options.
@@ -62,6 +62,17 @@ impl TimeConfig {
 
     fn default_locale() -> Option<String> {
         None
+    }
+}
+
+impl Default for TimeConfig {
+    fn default() -> Self {
+        Self {
+            format: Self::default_format(),
+            interval: Self::default_interval(),
+            timezone: Self::default_timezone(),
+            locale: Self::default_locale(),
+        }
     }
 }
 

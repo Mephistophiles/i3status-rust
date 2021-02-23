@@ -253,6 +253,23 @@ impl MemoryConfig {
     }
 }
 
+impl Default for MemoryConfig {
+    fn default() -> Self {
+        Self {
+            format_mem: Self::default_format_mem(),
+            format_swap: Self::default_format_swap(),
+            display_type: Self::default_display_type(),
+            icons: Self::default_icons(),
+            clickable: Self::default_clickable(),
+            interval: Self::default_interval(),
+            warning_mem: Self::default_warning_mem(),
+            warning_swap: Self::default_warning_swap(),
+            critical_mem: Self::default_critical_mem(),
+            critical_swap: Self::default_critical_swap(),
+        }
+    }
+}
+
 impl Memory {
     fn format_insert_values(&mut self, mem_state: Memstate) -> Result<String> {
         let mem_total = Unit::KiB(mem_state.mem_total());
