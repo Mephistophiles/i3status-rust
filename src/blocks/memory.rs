@@ -391,16 +391,12 @@ impl Block for Memory {
 
         let mut mem_state = Memstate::new();
 
-        for line in f.lines() {
+        for line in f.lines().filter_map(|l| l.ok()) {
             // stop reading if all values are already present
             if mem_state.done() {
                 break;
             }
 
-            let line = match line {
-                Ok(s) => s,
-                _ => continue,
-            };
             let line = line.split_whitespace().collect::<Vec<&str>>();
 
             match line.get(0) {
