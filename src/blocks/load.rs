@@ -119,11 +119,11 @@ impl Block for Load {
         f.read_to_string(&mut loadavg)
             .block_error("load", "Failed to read the load average of your system!")?;
 
-        let split: Vec<&str> = (&loadavg).split(' ').collect();
+        let mut tokens = (&loadavg).split(' ');
 
-        let values = map!("{1m}" => split[0],
-                          "{5m}" => split[1],
-                          "{15m}" => split[2]);
+        let values = map!("{1m}" => tokens.next().unwrap(),
+                          "{5m}" => tokens.next().unwrap(),
+                          "{15m}" => tokens.next().unwrap());
 
         let used_perc = values["{1m}"]
             .parse::<f32>()
